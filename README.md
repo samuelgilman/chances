@@ -29,8 +29,9 @@ The example below requests sends a request to a uri giving it several chances to
       interval: interval,
       log: log
 
-    }, function (result) {
-
+    }, function (err, result) {
+  
+      // err is a bolean
       // process result
 
     });
@@ -39,7 +40,6 @@ The example below requests sends a request to a uri giving it several chances to
 ### Result
 
     {
-      ok: true, // was it successful
       uri: 'http://www.domain.com', // given uri
       errs: [], // errors collected along the way
       body: '<html>stuff</html>' // body html
