@@ -53,7 +53,7 @@ module.exports = {
 
           log('CHANCES_SUCCESSFUL * limit -> ' + limit + ' * interval -> ' + interval + ' * uri -> ' + uri);
 
-          next(false, {
+          next(undefined, {
             uri: uri,
             errs: errs,
             body: body

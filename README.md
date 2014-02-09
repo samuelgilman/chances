@@ -31,8 +31,9 @@ The example below requests sends a request to a uri giving it several chances to
 
     }, function (err, result) {
   
-      // err is a bolean
-      // process result
+      // if there is an err it will
+      // be true. then use result.errs
+      // to see what went wrong 
 
     });
     
