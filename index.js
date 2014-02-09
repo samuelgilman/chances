@@ -16,8 +16,7 @@ module.exports = {
 
       log('CHANCES_GONE * limit -> ' + limit + ' * interval -> ' + interval + ' * uri -> ' + uri);
 
-      next({
-        ok: false,
+      next(true, {
         uri: uri,
         errs: errs,
         body: false
@@ -54,8 +53,7 @@ module.exports = {
 
           log('CHANCES_SUCCESSFUL * limit -> ' + limit + ' * interval -> ' + interval + ' * uri -> ' + uri);
 
-          next({
-            ok: true,
+          next(false, {
             uri: uri,
             errs: errs,
             body: body
