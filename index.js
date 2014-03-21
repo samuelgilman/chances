@@ -1,4 +1,5 @@
 var request = require('request');
+var zlib = require('zlib');
 
 module.exports = {
 
@@ -10,6 +11,7 @@ module.exports = {
     var limit = params.limit;
     var timeout = params.timeout;
     var interval = params.interval;
+    var gzip = params.gzip;
     var log = params.log || (function () {});
 
     if (!limit) {
@@ -27,7 +29,8 @@ module.exports = {
       that.crawl({
 
         uri: uri,
-        timeout: timeout
+        timeout: timeout,
+        gzip: gzip
 
       }, function (err, body) {
 
@@ -35,6 +38,13 @@ module.exports = {
 
           log(err);
           errs.push(err);
+
+          // If NOT_ACCEPTABLE happened, we should request for plain HTML
+          if(err.indexOf("NOT_ACCEPTABLE") !== -1) {
+
+            gzip = false;
+          
+          }
 
           log('CHANCES_AGAIN * limit -> ' + limit + ' * interval -> ' + interval + ' * uri -> ' + uri);
 
@@ -45,7 +55,8 @@ module.exports = {
               errs: errs,
               timeout: timeout,
               interval: interval,
-              log: log
+              log: log,
+              gzip: gzip
             }, next);
           }, interval);
 
@@ -72,13 +83,22 @@ module.exports = {
     var that = this;
     var uri = params.uri;
     var timeout = params.timeout;
+    var gzip = params.gzip;
+    var options = {};
 
-    request({
+    options.uri = uri;
+    options.timeout = timeout;
 
-      uri: uri,
-      timeout: timeout
+    if (gzip) {
 
-    }, function (err, res, body) {
+      options.headers = {
+        "accept-encoding": "gzip" 
+      };
+      options.encoding = null;
+    
+    }
+
+    request(options, function (err, res, body) {
 
       if (err) {
 
@@ -86,15 +106,55 @@ module.exports = {
 
       } else if (res.statusCode !== 200) {
 
-        err = ('REQUEST_CODE_BAD * code -> (' + res.statusCode + ') * timeout -> ' + timeout + ' * uri -> ' + uri);
+        if (res.statusCode === 406) {
+
+          err = ('REQUEST_NOT_ACCEPTABLE * uri -> ' + uri );
+        
+        } else {
+        
+          err = ('REQUEST_CODE_BAD * code -> (' + res.statusCode + ') * timeout -> ' + timeout + ' * uri -> ' + uri);
+
+        }
 
       } else if (!body) {
 
         err = ('REQUEST_BODY_MISS * timeout -> ' + timeout + ' * uri -> ' + uri);
 
+      } else {
+
+        var responseHeaders = res.headers;
+        var contentEncoding = responseHeaders['content-encoding'];
+        if (gzip && contentEncoding !== 'gzip') {
+          
+          // If our customer asked for a gzipped version but the 
+          // website doesn't provide it, we'll have to do it 
+          // ourselves
+
+          zlib.gunzip(body, function (err, res) {
+
+            var data;
+
+            if (res) {
+              data = res.toString(); 
+            }
+
+            next(err, data);
+          
+          });
+
+        } else {
+
+          next(err, body);
+        
+        }
+      
       }
 
-      next(err, body);
+      if (err) {
+      
+        next(err);
+
+      }
 
     });
 
