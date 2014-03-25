@@ -130,15 +130,13 @@ module.exports = {
           // website doesn't provide it, we'll have to do it 
           // ourselves
 
-          zlib.gunzip(body, function (err, res) {
+          zlib.gzip(body, function (err, res) {
 
-            var data;
-
-            if (res) {
-              data = res.toString(); 
+            var error;
+            if (err) {
+              error = err.toString(); 
             }
-
-            next(err, data);
+            next(error, res);
           
           });
 
