@@ -94,6 +94,7 @@ module.exports = {
 
     if (gzip) {
 
+      options.headers = options.headers || {};
       options.headers['accept-encoding'] = 'gzip';
       options.encoding = null;
     
