@@ -34,6 +34,7 @@ The example below requests sends a request to a uri giving it several chances to
       limit: limit,
       timeout: timeout,
       interval: interval,
+      requestOptions: requestOptions,
       gzip: gzip,
       log: log
 
