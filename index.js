@@ -11,6 +11,7 @@ module.exports = {
     var limit = params.limit;
     var timeout = params.timeout;
     var interval = params.interval;
+    var requestOptions = params.requestOptions;
     var gzip = params.gzip;
     var log = params.log || (function () {});
 
@@ -30,7 +31,8 @@ module.exports = {
 
         uri: uri,
         timeout: timeout,
-        gzip: gzip
+        gzip: gzip,
+        requestOptions: requestOptions
 
       }, function (err, body) {
 
@@ -55,6 +57,7 @@ module.exports = {
               errs: errs,
               timeout: timeout,
               interval: interval,
+              requestOptions: requestOptions,
               log: log,
               gzip: gzip
             }, next);
@@ -84,16 +87,15 @@ module.exports = {
     var uri = params.uri;
     var timeout = params.timeout;
     var gzip = params.gzip;
-    var options = {};
+    var options = params.requestOptions || {};
 
     options.uri = uri;
     options.timeout = timeout;
 
     if (gzip) {
 
-      options.headers = {
-        "accept-encoding": "gzip" 
-      };
+      options.headers = options.headers || {};
+      options.headers['accept-encoding'] = 'gzip';
       options.encoding = null;
     
     }

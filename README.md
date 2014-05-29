@@ -20,6 +20,13 @@ The example below requests sends a request to a uri giving it several chances to
     var tiemout = 5000; // for each try timeout after 5 seconds
     var interval = 2000; // then retry in 2 seconds
     var log = function (mes) { console.log(mes); } // your logger
+    var gzip = true; // if true, chances will always return gzipped body,
+                     // even if the server doesn't provides one.
+    var requestOptions = {
+      headers: {
+        'User-Agent': 'foo'
+      }
+    }; // additional options of request
     
     chances.process({
 
@@ -27,6 +34,8 @@ The example below requests sends a request to a uri giving it several chances to
       limit: limit,
       timeout: timeout,
       interval: interval,
+      requestOptions: requestOptions,
+      gzip: gzip,
       log: log
 
     }, function (err, result) {
