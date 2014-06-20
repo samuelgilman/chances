@@ -13,11 +13,13 @@ module.exports = {
     var interval = params.interval;
     var requestOptions = params.requestOptions;
     var gzip = params.gzip;
+    var randomize = params.randomize;
+    var maxInterval = params.maxInterval;
     var log = params.log || (function () {});
 
     if (!limit) {
 
-      log('CHANCES_GONE * limit -> ' + limit + ' * interval -> ' + interval + ' * uri -> ' + uri);
+      log('CHANCES_GONE * limit -> ' + limit + ' * uri -> ' + uri);
 
       next(true, {
         uri: uri,
@@ -48,20 +50,24 @@ module.exports = {
           
           }
 
-          log('CHANCES_AGAIN * limit -> ' + limit + ' * interval -> ' + interval + ' * uri -> ' + uri);
-
+          // Calculate interval
+          var randomizedInterval = that.getInterval(interval, maxInterval, randomize);
+          log('CHANCES_AGAIN * limit -> ' + limit + ' * interval -> ' + randomizedInterval + ' * uri -> ' + uri);
+          
           setTimeout(function () {
             that.process({
               uri: uri,
               limit: (limit-1),
               errs: errs,
               timeout: timeout,
-              interval: interval,
+              interval: randomizedInterval,
+              maxInterval: maxInterval,
               requestOptions: requestOptions,
               log: log,
-              gzip: gzip
+              gzip: gzip,
+              randomize: randomize
             }, next);
-          }, interval);
+          }, randomizedInterval);
 
         } else {
 
@@ -158,6 +164,25 @@ module.exports = {
 
     });
 
+  },
+
+  getInterval: function (interval, maxInterval, randomize) {
+
+    var factor = 1.5;
+    if(maxInterval && (interval > maxInterval)) {
+
+      interval = maxInterval;
+    
+    } 
+
+    if (randomize) {
+    
+      factor = 1 + Math.random() * 0.5;
+
+    }
+
+    return Math.floor(interval * factor);
+  
   }
 
 };
