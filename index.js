@@ -36,7 +36,7 @@ module.exports = {
         gzip: gzip,
         requestOptions: requestOptions
 
-      }, function (err, body) {
+      }, function (err, body, res) {
 
         if (err) {
 
@@ -74,8 +74,8 @@ module.exports = {
           log('CHANCES_SUCCESSFUL * limit -> ' + limit + ' * interval -> ' + interval + ' * uri -> ' + uri);
 
           next(undefined, {
-            uri: uri,
             errs: errs,
+            res: res,
             body: body
           });
 
@@ -138,19 +138,19 @@ module.exports = {
           // website doesn't provide it, we'll have to do it 
           // ourselves
 
-          zlib.gzip(body, function (err, res) {
+          zlib.gzip(body, function (err, gzipped) {
 
             var error;
             if (err) {
               error = err.toString(); 
             }
-            next(error, res);
+            next(error, gzipped, res);
           
           });
 
         } else {
 
-          next(err, body);
+          next(err, body, res);
         
         }
       
