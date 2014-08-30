@@ -75,8 +75,9 @@ module.exports = {
 
           next(undefined, {
             errs: errs,
-            res: res,
-            body: body
+            uri: uri,
+            body: body,
+            res: res
           });
 
         }
